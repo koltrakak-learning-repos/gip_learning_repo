@@ -186,6 +186,7 @@ seg_polilinea = 5     # numero di segmenti della polilinea con cui si approssima
 k = seg_polilinea + 1 # questo è il numero di intervalli contenenti punti del ramo che utilizziamo per calcolare la polilinea
 
 branch_linesets = []
+pc_linesets = []
 for obj in data["objects"]:
     # recupero i punti dei rami
     if obj["classTitle"] != "Branch 1":
@@ -210,6 +211,16 @@ for obj in data["objects"]:
 
     # ottengo le proiezioni di tutti i punti del ramo sul principal component
     proj = points_centered.dot(principal_component)
+
+   # Calcolo degli estremi della retta del principal component
+    pc_start = center + principal_component * proj.min()
+    pc_end   = center + principal_component * proj.max()
+    pc_line = o3d.geometry.LineSet(
+        points=o3d.utility.Vector3dVector([pc_start, pc_end]),
+        lines=o3d.utility.Vector2iVector([[0, 1]])
+    )
+    pc_line.colors = o3d.utility.Vector3dVector([[0, 0, 1]])  # blu
+    pc_linesets.append(pc_line)
     # Suddivisione in k segmenti:
     # - proj.min() → valore minimo lungo l’asse
     # - proj.max() → valore massimo lungo l’asse
@@ -258,5 +269,5 @@ for ls in branch_linesets:
 
 # Visualizzazione
 
-o3d.visualization.draw_geometries([segmented_pcd] + cylinders)
+o3d.visualization.draw_geometries([segmented_pcd] + cylinders + pc_linesets)
 o3d.visualization.draw_geometries(cylinders)
