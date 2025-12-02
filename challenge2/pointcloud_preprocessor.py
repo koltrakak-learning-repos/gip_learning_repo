@@ -1,157 +1,11 @@
-import open3d as o3d
-import json
 import numpy as np
-import os
-from collections import defaultdict
+import open3d as o3d 
 
-PCD_PATH = "./Vineyard Pointcloud/dataset 2025-10-03 09-46-48/pointcloud/pc_color_filtered.pcd"
-ANN_PATH = "./Vineyard Pointcloud/dataset 2025-10-03 09-46-48/ann/pc_color_filtered.pcd.json"
-
-pcd = o3d.io.read_point_cloud(PCD_PATH)
-points = np.asarray(pcd.points)
-print(f"[INFO] Loaded {len(points)} points.")
-
-print("[INFO] Loading annotations...")
-with open(ANN_PATH, "r") as f:
-    data = json.load(f)
-
-# Mappa che associa classi di segmentazione a colori
-class_colors = {
-    "Branch 1": [1, 0, 0],  # rosso
-    "Tree": [0, 1, 0],      # verde
-}
-
-# colora i punti in base alla loro classe di segmentazione
-colors = np.ones_like(points) * 0.5  # default grigio
-
-figures = data.get("figures", [])
-
-for fig in figures:
-    obj = next((o for o in data["objects"] if o["key"] == fig["objectKey"]), None) # generator expression
-    if obj is None:
-        continue
-
-    base_color = class_colors.get(obj["classTitle"], np.array([0.5, 0.5, 0.5]))
-    # Genera una piccola variazione casuale per rendere ogni figura leggermente diversa
-    variation = (np.random.rand(3) - 0.5) # tripla di tre valori appartenenti a [-0.5, 0.5] 
-    color = np.clip(base_color + variation, 0, 1)  # mantieni valori tra 0 e 1
-    
-    indices = fig["geometry"]["indices"]
-    if len(indices) > 0:
-        colors[indices] = color
-
-# Siccome, alcuni oggetti sono spezzati in più figure
-# raggruppiamo tutte le figure per objectKey 
-
-# 'defaultdict(list)' è come un dict normale ma se accedi 
-# a una chiave che non esiste, viene automaticamente creata 
-# con un valore di default (in questo caso lista vuota).
-object_to_indices = defaultdict(list) 
-
-for fig in data["figures"]:
-    obj_key = fig["objectKey"]
-    indices = fig["geometry"]["indices"]
-    # estende la lista associata all'objectKey corrente
-    object_to_indices[obj_key].extend(indices) 
-
-branch_counter = 0
-for obj in data["objects"]:
-    if obj["classTitle"] != "Branch 1":
-        continue
-    # 'key' per objects == 'objectKey' per figures (che sono quelle che ho nella mappa)
-    all_indices = object_to_indices[obj["key"]]
-    branch_points = points[all_indices]
-    branch_counter += 1
-    print(f"\n--- Branch {branch_counter} (objectKey={obj["key"]}) ---")
-    print("Primi 10 punti:")
-    print(branch_points[:10])
-
-print(f"\nTotale rami trovati: {branch_counter}")
-
+seg_polilinea = 5     # numero di segmenti della polilinea con cui si approssima ogni ramo
+k = seg_polilinea + 1 # questo è il numero di intervalli contenenti punti del ramo che utilizziamo per calcolare la polilinea
 
 # =========================================================
-# CREA POINTCLOUD OPEN3D E VISUALIZZA
-# =========================================================
-
-# funzioni di visualizzazione che trasformano linee (spesse 1px)
-# in cilindri di spessore più grande
-def line_to_cylinder(start, end, radius=0.01, color=[1,0,1], resolution=20):
-    """
-    Crea un cilindro che collega i punti `start` e `end`.
-    - start, end: array-like (3,)
-    - radius: raggio del cilindro
-    - color: lista RGB nel range [0,1]
-    - resolution: risoluzione del cilindro (numero di lati)
-    Restituisce un o3d.geometry.TriangleMesh oppure None se start==end.
-    """
-    start = np.asarray(start, dtype=float)
-    end = np.asarray(end, dtype=float)
-    vec = end - start
-    length = np.linalg.norm(vec)
-    if length == 0.0:
-        return None
-
-    # crea cilindro centrato all'origine con asse z e altezza = length
-    cylinder = o3d.geometry.TriangleMesh.create_cylinder(radius=radius, height=length, resolution=resolution, split=4)
-    cylinder.compute_vertex_normals()
-
-    # colore
-    color = np.asarray(color, dtype=float)
-    if color.size == 3:
-        color = np.clip(color, 0.0, 1.0)
-        cylinder.paint_uniform_color(color.tolist())
-
-    # direzione target (unitario)
-    v = vec / length
-    z_axis = np.array([0.0, 0.0, 1.0])
-
-    # calcola rotazione: vogliamo ruotare z_axis -> v
-    # caso 1: vettori quasi uguali -> nessuna rotazione
-    dot = np.dot(z_axis, v)
-    eps = 1e-6
-    if dot > 1.0 - eps:
-        R = np.eye(3)
-    elif dot < -1.0 + eps:
-        # z and v sono opposti: rotazione di pi attorno a qualsiasi asse ortogonale (es. x)
-        R = o3d.geometry.get_rotation_matrix_from_axis_angle(np.array([1.0, 0.0, 0.0]) * np.pi)
-    else:
-        axis = np.cross(z_axis, v)
-        axis_norm = np.linalg.norm(axis)
-        axis_unit = axis / axis_norm
-        angle = np.arccos(dot)
-        R = o3d.geometry.get_rotation_matrix_from_axis_angle(axis_unit * angle)
-
-    # ruota il cilindro attorno all'origine (è centrato sull'origine)
-    cylinder.rotate(R, center=np.zeros(3))
-
-    # trasla al midpoint (perché il cilindro è centrato nell'origine)
-    midpoint = (start + end) / 2.0
-    cylinder.translate(midpoint)
-
-    return cylinder
-
-def lineset_to_cylinders(line_set, radius=0.01, color=[1,0,0]):
-    cylinders = []
-    pts = np.asarray(line_set.points)
-    lines = np.asarray(line_set.lines)
-
-    for (i, j) in lines:
-        start = pts[i]
-        end   = pts[j]
-        cyl = line_to_cylinder(start, end, radius=radius, color=color)
-        if cyl is not None:
-            cylinders.append(cyl)
-
-    return cylinders
-
-segmented_pcd = o3d.geometry.PointCloud()
-segmented_pcd.points = o3d.utility.Vector3dVector(points)
-segmented_pcd.colors = o3d.utility.Vector3dVector(colors) # commenta via se vuoi i colori originali della pointcloud
-print("[INFO] Visualizing segmented point cloud...")
-o3d.visualization.draw_geometries([segmented_pcd])
-
-# =========================================================
-# PCA per ogni ramo (TODO: aggiungere emoji fuoco)
+# PCA per ogni ramo 
 # =========================================================
 
 # PCA (Principal Component Analisys) è una tecnica che serve a trovare 
@@ -173,33 +27,21 @@ o3d.visualization.draw_geometries([segmented_pcd])
 #                       [var(x), cov(x,y), cov(x,z)]
 #   - cov(punti_ramo) = [cov(y,x), var(y), cov(y,z)] 
 #                       [cov(z,x), cov(z,y), var(z)]
-#   - La covarianza come due variabili (ad esempio X e Y) cambiano insieme.
+#   - La covarianza misura come due variabili (ad esempio X e Y) cambiano insieme.
 #       - se cov(x, y) > 0 -> se x cresce, y cresce; se cov(x,y) < 0 -> se x cresce y, y decresce
 #       - la correlazione è una versione “normalizzata” della covarianza.
 # - Trova gli autovettori della matrice di covarianza:
 #   - A quanto pare si può dimostrare che l'autovalore più grande definisce un autovettore
 #     che rappresenta proprio è la direzione lungo cui i punti variano di più → cioè l'asse principale del ramo;
 #   - gli altri due sono direzioni ortogonali minori (spessore e profondità).
+# 
+# Una volta trovata l'asse principale di ogni ramo, per approssimare quest'ultimi possiamo
+# - dividere l'asse in parti uguali
+# - proiettare ogni punto del ramo sull'asse e vedere in che sezione finisce
+# - ... TODO: finisci
 
-
-seg_polilinea = 5     # numero di segmenti della polilinea con cui si approssima ogni ramo
-k = seg_polilinea + 1 # questo è il numero di intervalli contenenti punti del ramo che utilizziamo per calcolare la polilinea
-
-branch_linesets = []
-pc_linesets = []
-for obj in data["objects"]:
-    # recupero i punti dei rami
-    if obj["classTitle"] != "Branch 1":
-        continue
-    all_indices = object_to_indices[obj["key"]]
-    branch_points = points[all_indices]
-
-    if len(branch_points) < 5:
-        continue  # troppo pochi punti per PCA
-
-    # PCA
-    center = branch_points.mean(axis=0)
-    points_centered = branch_points - center
+def PCA(points, center):
+    points_centered = points - center
     # np.cov() si aspetta una matrice dove ogni riga è una variabile e ogni colonna è un'osservazione.
     # Ovvero una shape: (3, num_punti)
     # ma noi abbiamo un array di punti con shape: (num_punti, 3), e quindi facciamo una trasposta
@@ -209,10 +51,31 @@ for obj in data["objects"]:
     # prendiamo il vettore colonna associato all'autovalore più grande
     principal_component = eigvecs[:, np.argmax(eigvals)]  # direzione principale
 
+    return points_centered, principal_component
+
+def approximate_branch(branch_points, branch_colors):
+    """
+    questa funzione, dati gli oggetti che descrivono i rami nella pointcloud segmentata,
+    approssima i rami con una polilinea
+
+    Parametri:
+        - branch_points: i punti che rappresentano un ramo
+        - branch_colors: colori dei punti del ramo
+        
+    Ritorna:
+        - branch_segments: lista dei punti del ramo suddivisi per segmenti
+        - color_segments: lista dei colori del ramo suddivisi per segmenti 
+        - principal_component: asse che approssima il meglio possibile il ramo
+        - centers: la lista di centroidi che rappresentano gli estremi dei segmenti della polilinea
+        - pc_line: la linea del principal_component del ramo (per visualizzazione)
+    """
+    
+    center = branch_points.mean(axis=0)
+    points_centered, principal_component = PCA(branch_points, center)
     # ottengo le proiezioni di tutti i punti del ramo sul principal component
     proj = points_centered.dot(principal_component)
 
-   # Calcolo degli estremi della retta del principal component
+    # Calcolo degli estremi della retta del principal component
     pc_start = center + principal_component * proj.min()
     pc_end   = center + principal_component * proj.max()
     pc_line = o3d.geometry.LineSet(
@@ -220,7 +83,7 @@ for obj in data["objects"]:
         lines=o3d.utility.Vector2iVector([[0, 1]])
     )
     pc_line.colors = o3d.utility.Vector3dVector([[0, 0, 1]])  # blu
-    pc_linesets.append(pc_line)
+
     # Suddivisione in k segmenti:
     # - proj.min() → valore minimo lungo l’asse
     # - proj.max() → valore massimo lungo l’asse
@@ -228,6 +91,8 @@ for obj in data["objects"]:
     edges = np.linspace(proj.min(), proj.max(), k+1)
 
     centers = []
+    branch_segments = []
+    color_segments = []
     for i in range(k):
         # Controlliamo quali proiezioni finiscono in quale segmento
         # - mask è un array booleano della stessa lunghezza di proj, dove:
@@ -237,37 +102,106 @@ for obj in data["objects"]:
         if np.any(mask):
             # utilizzo la maschera per ottenere i punti del ramo corrispondenti
             # al segmento corrente. Di questi ne calcolo il centroide
-
-            # TODO: su questo branch segment posso calcolare le feature interessanti
-            # - Diametro
-            # - colore
-            # - lunghezza ramo (ci dice numero di gemme)
-            # - inclinazione del ramo rispetto al cordone principale (angolo)
-            branch_segment = branch_points[mask]
-            centers.append(branch_segment.mean(axis=0))
+            branch_segment_points = branch_points[mask]
+            branch_segments.append(branch_segment_points)
+            centers.append(branch_segment_points.mean(axis=0))
+            color_segment = branch_colors[mask]
+            color_segments.append(color_segment)
 
     centers = np.array(centers)
     if len(centers) < 2:
-        continue  # non posso creare una polilinea con <2 punti
+        return None, None, None  # non posso creare una polilinea con <2 punti
 
-    # Crea line set per visualizzare i segmenti del ramo
-    # Mi basta connettere i centroidi calcolati. Ad es:
-    # - centers = [c0, c1, c2, c3, c4]
-    # - lines = [[0,1], [1,2], [2,3], [3,4]]
-    lines = [[i, i+1] for i in range(len(centers)-1)]
-    line_set = o3d.geometry.LineSet(
-        points=o3d.utility.Vector3dVector(centers),
-        lines=o3d.utility.Vector2iVector(lines)
-    )
-    line_set.colors = o3d.utility.Vector3dVector([[1,0,1] for _ in lines]) 
+    return branch_segments, color_segments, principal_component, centers, pc_line
 
-    branch_linesets.append(line_set)
 
-cylinders = []
-for ls in branch_linesets:
-    cylinders.extend(lineset_to_cylinders(ls, radius=0.01, color=[1,0,1]))
+def compute_branch_features(branch_segments, branch_dir, tree_points, tree_dir, color_segments):
+    """
+    Calcola feature utili per un ramo segmentato in sotto-segmenti.
 
-# Visualizzazione
+    Parametri:
+        - branch_segments: lista di array Nx3, ogni array rappresenta un segmento del ramo
+        - branch_dir: principal component del ramo
+        - tree_points: point cloud (Nx3) del tronco/capofila principale
+        - tree_dir: principal component del tronco
+        - branch_colors: array_contenente i colori dei punti del ramo
 
-o3d.visualization.draw_geometries([segmented_pcd] + cylinders + pc_linesets)
-o3d.visualization.draw_geometries(cylinders)
+    Ritorna:
+        Un dizionario con:
+            - diameters: diametro stimato per ogni segmento
+            - colors: colore medio per segmento (se disponibile)
+            - branch_length: lunghezza totale del ramo
+            - inclination_angle: angolo in gradi tra ramo e tronco
+    """
+
+    # ------------------------------
+    # 1. DIAMETRO LOCALE PER SEGMENTO
+    # ------------------------------
+    diameters = []
+    seg_centers = []
+
+    for seg in branch_segments:
+        if len(seg) < 3:
+            diameters.append(0)
+            seg_centers.append(seg.mean(axis=0))
+            continue
+
+        center = seg.mean(axis=0)
+        seg_centers.append(center)
+        # PCA locale per stimare diametro
+        pts_centered = seg - center
+        cov = np.cov(pts_centered.T)
+        eigvals, eigvecs = np.linalg.eig(cov)
+        # diametro = 2*std_dev (autovalore minore)
+        raggio = np.sqrt(np.min(eigvals))
+        diameter = 2*raggio
+        diameters.append(float(diameter))
+
+    # ------------------------------
+    # 2. LUNGHEZZA TOTALE DEL RAMO
+    # ------------------------------
+    branch_length = 0.0
+    seg_centers = np.array(seg_centers)
+    for i in range(len(seg_centers) - 1):
+        branch_length += np.linalg.norm(seg_centers[i+1] - seg_centers[i])
+
+    # ------------------------------
+    # 3. INCLINAZIONE DEL RAMO RISPETTO AL TRONCO
+    # ------------------------------
+
+    branch_dir = branch_dir / np.linalg.norm(branch_dir)
+    tree_dir = tree_dir / np.linalg.norm(tree_dir)
+    dot = branch_dir.dot(tree_dir)
+    angle_rad = np.arccos(abs(dot))
+    inclination_angle = np.degrees(angle_rad)
+
+    # ------------------------------
+    # 4. COLORE MEDIO per segmento (se esiste)
+    # ------------------------------
+
+    mean_colors = []
+    for seg_colors in color_segments:
+        if len(seg_colors) > 0:
+            mean_colors.append(seg_colors.mean(axis=0))
+        else:
+            mean_colors.append(None)
+
+    # ------------------------------
+    # OUTPUT
+    # ------------------------------
+    return {
+        "diameters": diameters,
+        "branch_length": float(branch_length),
+        "inclination_angle": float(inclination_angle),
+        "mean_colors": mean_colors
+    }
+
+    # df = pd.DataFrame({
+    #     "segment_index": list(range(len(branch_segments))),
+    #     "diameter": diameters,
+    #     "center_x": seg_centers[:, 0],
+    #     "center_y": seg_centers[:, 1],
+    #     "center_z": seg_centers[:, 2],
+    #     "mean_color": colors
+    # })
+
