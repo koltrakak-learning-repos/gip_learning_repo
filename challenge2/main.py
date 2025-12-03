@@ -3,6 +3,7 @@ import json
 import numpy as np
 from collections import defaultdict
 from pprint import pprint
+import random
 
 import pointcloud_preprocessor as pcpp
 import visualization_stuff
@@ -65,7 +66,7 @@ segmented_pcd = o3d.geometry.PointCloud()
 segmented_pcd.points = o3d.utility.Vector3dVector(points)
 segmented_pcd.colors = o3d.utility.Vector3dVector(new_colors)
 print("[INFO] Visualizing segmented point cloud...")
-# o3d.visualization.draw_geometries([segmented_pcd]) # commenta via se non serve
+o3d.visualization.draw_geometries([segmented_pcd]) # commenta via se non serve
 
 # approssimo il tronco principale
 tree_pc_lineset = []
@@ -128,10 +129,9 @@ for branch_obj in data["objects"]:
 
 cylinders = []
 for ls in branch_linesets:
-    cylinders.extend(visualization_stuff.lineset_to_cylinders(ls, radius=0.003, color=[1,1,0]))
+    cylinders.extend(visualization_stuff.lineset_to_cylinders(ls, radius=0.01, color=[1,1,0]))
 
 o3d.visualization.draw_geometries([segmented_pcd] + cylinders + branch_pc_linesets + tree_pc_lineset)
-# o3d.visualization.draw_geometries(cylinders)
 
 
 def create_cut_plane(principal_component, threshold_point, size=0.15):
@@ -177,7 +177,9 @@ def color_branch_cut_10_percent(branch_points, branch_colors=None):
 
     proj = points_centered.dot(principal_component)
     min_proj, max_proj = proj.min(), proj.max()
-    threshold = min_proj + 0.1 * (max_proj - min_proj)
+    # taglio ad altezze random
+    whatever = 0.2 + random.random() * 0.5
+    threshold = min_proj + whatever * (max_proj - min_proj)
 
     mask = proj > threshold
     pcd = o3d.geometry.PointCloud()
@@ -207,6 +209,11 @@ cut_planes = []
 for branch_obj in data["objects"]:
     if branch_obj["classTitle"] != "Branch 1":
         continue
+
+    # poto solo il 40% dei rami
+    if random.random() < 0.6:
+        continue
+    
     all_indices = object_to_indices[branch_obj["key"]]
     branch_points = points[all_indices]
     branch_colors = colors[all_indices]
@@ -215,6 +222,4 @@ for branch_obj in data["objects"]:
     cut_branch_pcds.append(pcd_cut)
     cut_planes.append(plane)
 
-o3d.visualization.draw_geometries([segmented_pcd] + branch_pc_linesets + tree_pc_lineset + cut_branch_pcds + cut_planes)
-
-
+o3d.visualization.draw_geometries([segmented_pcd] + cylinders + branch_pc_linesets + tree_pc_lineset + cut_branch_pcds + cut_planes)
