@@ -139,7 +139,16 @@ Col tempo, il progresso tecnologico migliora e arriva un’altra discontinuità 
 
 # Appropriabilità
 
-L’appropriabilità è la capacità di un’impresa di acquisire e trattenere per sé le rendite generate dai propri processi innovativi.
+Da cosa dipende il successo dell’innovatore?
+
+- Uno dei fattori che possono portare al successo è il regime di appropriazione dell’innovazione.
+
+L’appropriabilità è la capacità di un’impresa di acquisire e trattenere per sé le rendite generate dai propri prodotti/processi innovativi.
+
+I modi possibili di ottenere questi benefici possono essere:
+
+- La possibilità di proteggere adeguatamente la tecnologia con strumenti legali (es. brevetti).
+- purtroppo questo in genere non basta e quindi a volte si devono anche mantenere dei segreti aziendali
 
 Il grado di appropriabilità di un’innovazione è determinato dalla facilità e dalla rapidità con cui i concorrenti riescono ad imitarla.
 
@@ -154,27 +163,28 @@ I first mover sono i primi ad entrare sul mercato, mentre i follower arrivano do
 - Ogni strategia può essere vincente o perdente, ma non è definibile a priori quale delle 2 strategie sarà corretta
 
 Vediamo i vantaggi di un first mover:
-- Sostenibilità del primato tecnologico: brevettando per primo l’idea, i concorrenti non possono duplicare la tecnologia.
-    - Questo comporta quindi che la rapidità di innovazione dell’impresa sia diversa (maggiore) di quella dei concorrenti che devono trovare altre idee
-• Vantaggi dovuti ad aver fatto prima mossa come 
-        - la reputazione
-        - costi di sostituzione
-        - scelta del canale
-        - curva di apprendimento esclusiva
-        - accesso agevolato a risorse scarse
-        - definizione di standard e profitti iniziali
+
+- Sostenibilità del primato tecnologico:
+  - **brevettando per primo l’idea, i concorrenti non possono duplicare la tecnologia.**
+  - Questo comporta quindi che la rapidità di innovazione dell’impresa sia maggiore di quella dei concorrenti che devono trovare altre idee
+
+- Vantaggi dovuti ad aver fatto prima mossa come:
+  - la reputazione
+  - costi di sostituzione
+  - curva di apprendimento esclusiva
+  - accesso agevolato a risorse scarse
+  - definizione di standard e profitti iniziali
+
 Un first mover ha comunque degli svantaggi dovuti ad aver fatto la prima mossa:
-• Costi del pionierismo: educazione degli acquirenti
-        - sviluppo di infrastrutture
-        - sviluppo di input
-necessari
-        - sviluppo di prodotti complementari
-        - costi elevati dei primi input e l’approvazione delle
-autorità
-• Rischio: incertezza della domanda
-        - cambiamenti dei fabbisogni degli acquirenti
-        - specificità degli
-investimenti iniziali
+
+- Costi del pionierismo:
+  - educazione degli acquirenti
+  - sviluppo di infrastrutture
+
+- Rischio:
+  - incertezza della domanda
+  - cambiamenti dei fabbisogni degli acquirenti
+  - specificità degli investimenti iniziali
 
 # Proprietà Intellettuale
 
