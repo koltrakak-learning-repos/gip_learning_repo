@@ -186,6 +186,104 @@ Un first mover ha comunque degli svantaggi dovuti ad aver fatto la prima mossa:
   - cambiamenti dei fabbisogni degli acquirenti
   - specificità degli investimenti iniziali
 
-# Proprietà Intellettuale
+# Proprietà intellettuale, a cosa serve?
 
-La proprietà intellettuale è uno degli elementi importanti per saper gestire il processo di gestione dell’innovazione perché permette di capire come si stanno muovendo le aziende in determinati ambiti innovativi facendo riferimento ai brevetti.
+I risultati delle attività di ricerca e sviluppo (R&S) hanno le caratteristiche di un bene pubblico
+
+Spesso il guadagno sociale dato da un’innovazione è molto maggiore del guadagno privato perché può contribuire ad aumentare notevolmente la conoscenza in un determinato settore.
+
+- Questo è anche uno dei motivi di rischi di fallimento dei first movers.
+- i follower possono aspettare che i first mover innovino (assumendosi tutto il rischio), copiare e partire dallo stesso starting point dei first movers ottenendo tutti i benefici
+
+Ma così non si è incentivati ad innovare dato che tutti possono rubare il tuo lavoro, che senso ha assumersi i rischi se posso copiare?
+
+Per ovviare a questi rischi, lo Stato può intervenire con misure di incentivazione alla R&S, inclusi i titoli di proprietà intellettuale
+
+La proprietà intellettuale è uno degli elementi importanti per saper gestire il processo di gestione dell’innovazione perché permette di capire come si stanno muovendo le aziende in determinati ambiti innovativi facendo riferimento agli strumenti di proprietà intellettuale che stanno usando
+
+- in particolare i nuovi brevetti registrati sono interessanti
+
+# Gli strumenti della Proprietà Intellettuale (IP)
+
+## Diritti d'autore (copyright)
+
+Protegge:
+
+- impedendo riproduzione e distribuzione
+- garantendo la paternità
+
+Il diritto d’autore riguarda le opere dell’ingegno di carattere creativo (es.: letteratura, musica, arti figurative, architettura, teatro, cinematografia, ecc.), tra cui anche:
+
+- programmi per elaboratore (software)
+- progetti d’ingegneria (Art. 99 LdA)
+
+Non è richiesto alcun deposito! Il diritto nasce automaticamente, all’atto della creazione. Durata: vita dell’autore + 70 anni
+
+## Marchi (Trademarks)
+
+**I marchi proteggono i prodotti e i servizi in maniera che siano distintivi**
+
+- ovvero che esista un elemento distintivo che li identifichi
+
+Sono marchi: parole, i disegni, i suoni, le forme (del prodotto o di una sua confezione), le combinazioni o tonalità cromatiche
+
+- nuovi  (non posso copiare o modificare leggermente un marchio già presente)
+- distinti rispetto a quelli già presente
+
+La durata è potenzialmente illimitata ma va rinnovata
+
+## Design
+
+I design proteggono le caratteristiche estetiche di un prodotto o di una sua parte, e non caratteristiche tecniche.
+
+Il design deve essere depositato, ma per essere accettato un design deve essere nuovo (diverso da qualsiasi altro design) e possedere carattere individuale, cioè non deve ricordare mentalmente altri design.
+
+# Brevetti (Patents)
+
+Il brevetto serve per proteggere nuove invenzioni, cioè soluzioni originali che consentono il superamento di un problema tecnico.
+
+Per ottenere un brevetto, l’invenzione deve soddisfare le seguenti caratteristiche:
+
+- Novità
+- Frutto di attività inventiva (non ovvietà): deve essere originale o ad altezza inventiva
+- **Deve esserci un’applicazione industriale**:
+  - deve essere radicabile in un prodotto o in un servizio che possa essere di utilizzo
+- e deve essere appropriatamente descritta
+
+Il brevetto non considera invenzioni:
+
+- Le scoperte, le teorie scientifiche e i metodi matematici
+- I piani, i principi e i metodi per attività intellettuali **ed i programmi di elaboratore (fini a se stessi)**
+  - questo per il terzo requisito di applicabilità industriale -> deve essere concretizzabile in un prodotto
+
+**NB**: è fondamentale la qualità tecnica dell'invenzione per ottenere il brevetto, ovvero il risvolto concreto che l'invenzione ha.
+
+- un programma che mi calcola la FFT non è brevettabile
+- un programma che mi calcola la FFT per fare da equalizzatore della stereo in una macchina è brevettabile
+
+Per ottenere un brevetto bisogna depositare la domanda a uno dei macro-uffici EPO, USPTO, JPO; dopodiché viene fatta un’esaminazione da parte di quelle persone che si occupano di proprietà intellettuale nell’ambito in cui si vuole depositare il brevetto.
+
+La durata è limitata nel tempo (in genere 20 anni dal deposito della domanda) e nello spazio.
+
+- più la durata è ampia più costa ottenere il brevetto
+
+## A cosa servono i brevetti?
+
+- A fornire incentivi allo sviluppo di invenzioni
+  - nessuno può rubarmi l'invenzione (per almeno 20 anni)
+    - sia nel caso di prodotto che di processo, nessuno può copiarmi
+  - sono l'unico che ne può trarne profitto
+- A facilitare il processo di diffusione delle invenzioni
+  - l'invenzione è documentata nel brevetto
+- (A facilitare il processo di commercializzazione delle invenzioni)
+- (A facilitare il processo di controllo e coordinamento della ricerca)
+
+## Come si utilizzano i brevetti
+
+- Tutela vantaggio da first mover ed esclusione dei concorrenti (posizione di monopolio)
+- Fonte di nuove entrate (accordi di licensing)
+  - ti concedo il mio brevetto per un po' ma tu mi paghi delle royalties
+- Strumento di negoziazione (accordi di R&D)
+  - è un bene come un altro che può essere di valore per con chi sto negoziando
+- IP come strumento finanziario (facilitare l’accesso a finanziamenti pubblici, banche, VC)
+  - se ho un brevetto sono uno serio
