@@ -287,3 +287,11 @@ La durata è limitata nel tempo (in genere 20 anni dal deposito della domanda) e
   - è un bene come un altro che può essere di valore per con chi sto negoziando
 - IP come strumento finanziario (facilitare l’accesso a finanziamenti pubblici, banche, VC)
   - se ho un brevetto sono uno serio
+
+## Quando ricorrere al segreto industriale
+
+Come è noto, imporre il rispetto o rafforzare l’efficacia dei brevetti a protezione dei processi o delle tecniche di produzione è tutt’altro che semplice.
+
+Quando i brevetti forniscono a stento margini di protezione, le imprese possono affidarsi con maggiore frequenza al segreto industriale, anche se la capacità di proteggere la riservatezza varia anch’essa in base alla natura della tecnologia e alle caratteristiche del settore.
+
+Per proteggere un segreto industriale con efficacia, un’impresa deve essere in grado di esporre al pubblico e distribuire nel mercato il proprio prodotto riuscendo a non rivelare le tecnologie o le conoscenze su cui è basato. A volte, tuttavia, la sola apparizione del prodotto rischia di svelarne tutti i segreti
