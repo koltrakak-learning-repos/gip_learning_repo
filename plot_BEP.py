@@ -1,38 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Anni (orizzonte temporale)
-anni = np.arange(0, 11)  # da anno 0 a anno 10
+anni = np.arange(0, 6, 0.5)
 
-# Parametri della parabola
-# Guadagni = a*(anni - h)^2 + k
-a = 15      # velocità di crescita
-h = 3       # anno del minimo (fase peggiore)
-k = -200    # perdita massima
+# Parametri economici imposti (in migliagia di euro)
+cf_iniziale = 0
+# se non vendiamo nulla per due anni abbiamo 
+cf_minimo = -700
+anno_minimo = 1.4
 
-guadagni = a * (anni - h)**2 + k
-
-# Calcolo BEP (intersezione con asse x)
-bep_anni = h + np.sqrt(-k / a)
+# Il break even è dato da questa formula
+a = (cf_iniziale - cf_minimo) / (anno_minimo ** 2)
+cash_flow = a * (anni - anno_minimo)**2 + cf_minimo
+bep = anno_minimo + np.sqrt(-cf_minimo / a)
 
 # Plot
 plt.figure()
-plt.plot(anni, guadagni)
-plt.axvline(bep_anni, linestyle="--")
+plt.plot(anni, cash_flow)
+plt.axvline(bep, linestyle="--")
+plt.scatter(bep, 0)
+plt.text(bep, 0, f"  BEP ≈ anno {bep:.1f}")
 
-# Evidenzia BEP
-plt.scatter(bep_anni, 0)
-plt.text(
-    bep_anni,
-    0,
-    f"   BEP ≈ anno {bep_anni:.1f}",
-    verticalalignment="bottom"
-)
-
-# Etichette
-plt.xlabel("Anni")
-plt.ylabel("Guadagni (€)")
-plt.title("Ricavi nel tempo")
-
+plt.xlabel("Anno")
+plt.ylabel("Flusso di cassa cumulato (in k€)")
+plt.title("Stima BEP")
 plt.grid(True)
 plt.show()
