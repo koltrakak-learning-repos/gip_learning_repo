@@ -1,5 +1,5 @@
-# Challange 2
+# Prototipo per la Challenge 2 
 
-Nella cartella è presente l'esportazione di un progetto Supervisely contentente una pointcloud segmentata. Per visualizzarla, si può reimportare il progetto su Supervisely.
-Purtroppo al momento è presente solo 1 pointcloud. Se volete potete etichettarne altre prendendole dai file della challange 1.
-C'è anche un video con le indicazioni di massima raccolte da un potatore esperto del settore.
+Il progetto python in questa cartella effettua un'analisi della pointcloud della vigna per decidere quali rami tagliare. 
+
+Per fare ciò viene effettuata un'approssimazione dei rami della vite costruendo una polilinea e sui segmenti di quest'ultima si calcolano feature utili a capire se il ramo è da tagliare o meno (curvatura, lunghezza, colore, ...).
